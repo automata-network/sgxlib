@@ -1,0 +1,52 @@
+[package]
+name = "sgxlib"
+version = "0.1.0"
+authors = [ "Automata Authors" ]
+edition = "2021"
+
+[features]
+default = ["std"]
+std = []
+sgx = ["ucrypto"]
+tstd = ["sgx_tstd", "tcrypto"]
+
+types = ["sgx_types"]
+ucrypto = ["sgx_ucrypto"]
+tcrypto = ["sgx_tcrypto"]
+urts = ["sgx_urts"]
+trts = ["sgx_trts"]
+libc = ["sgx_libc"]
+tkey_exchange = ["sgx_tkey_exchange"]
+
+[dependencies]
+sgx_tstd = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git", features = ["untrusted_fs", "net", "thread", "untrusted_time"] }
+sgx_types = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_ucrypto = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_tcrypto = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_urts = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_trts = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_libc = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+sgx_tkey_exchange = { optional = true, git = "https://github.com/apache/teaclave-sgx-sdk.git" }
+
+[workspace]
+members = [
+    "builder",
+    "enclave",
+]
+
+[patch.'https://github.com/apache/teaclave-sgx-sdk.git']
+sgx_alloc = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_backtrace_sys = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_build_helper = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_demangle = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_libc = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_rand = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_tcrypto = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_ucrypto = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_tkey_exchange = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_tprotected_fs = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_trts = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_tstd = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_types = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_unwind = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }
+sgx_urts = { git = "https://github.com/automata-network/incubator-teaclave-sgx-sdk", tag = "v1.1.4" }

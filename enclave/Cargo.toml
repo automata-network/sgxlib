@@ -1,0 +1,11 @@
+[package]
+name = "sgxlib-enclave"
+version = "0.1.0"
+authors = [ "Automata Authors" ]
+edition = "2021"
+
+[features]
+
+[dependencies]
+sgxlib = { path = "../", default-features = false, features = ["urts", "types"] }
+
