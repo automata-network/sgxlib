@@ -16,6 +16,7 @@ mod teaclave;
 
 pub use enclave::Build as EnclaveBuild;
 pub use geode::Build as GeodeBuild;
+pub use intel::LinkType;
 
 lazy_static! {
     static ref CARGO_MANIFEST_DIR: String = env::var("CARGO_MANIFEST_DIR").unwrap();

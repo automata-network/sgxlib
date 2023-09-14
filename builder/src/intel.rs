@@ -79,17 +79,28 @@ pub fn sgx_common_cflags() -> Vec<&'static str> {
     args
 }
 
-pub fn sgx_sdk_cargo_metadata() {
+pub enum LinkType {
+    Epid,
+    Dcap,
+}
+
+pub fn sgx_sdk_cargo_metadata(ty: LinkType) {
     println!(
         "cargo:rustc-link-search=native={}/lib64",
         &SGX_SDK.to_string()
     );
     println!("cargo:rustc-link-lib=static=sgx_uprotected_fs");
     println!("cargo:rustc-link-lib=static=sgx_ukey_exchange");
+    if let LinkType::Dcap = ty {
+        println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu");
+        println!("cargo:rustc-link-lib=dylib=sgx_dcap_ql");
+    }
 
     if "HW" == SGX_MODE.to_string() {
         println!("cargo:rustc-link-lib=dylib=sgx_urts");
-        println!("cargo:rustc-link-lib=dylib=sgx_epid");
+        if let LinkType::Epid = ty {
+            println!("cargo:rustc-link-lib=dylib=sgx_epid");
+        }
         println!("cargo:rustc-link-lib=dylib=sgx_launch");
         println!("cargo:rustc-link-lib=dylib=sgx_quote_ex");
     } else {

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::*;
+use crate::intel::LinkType;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -51,7 +52,7 @@ impl Build {
         }
     }
 
-    pub fn build(&self) {
+    pub fn build(&self, ty: LinkType) {
         let mut ecall_externs = vec![];
 
         let _ = &self.enclaves.iter().for_each(|e| {
@@ -77,6 +78,6 @@ impl Build {
 
         generate_extern_proxy(&self.out_dir.join("ecall.rs"), &ecall_externs);
 
-        intel::sgx_sdk_cargo_metadata();
+        intel::sgx_sdk_cargo_metadata(ty);
     }
 }
