@@ -1,6 +1,6 @@
 # SGX Library
 
-[![License](https://img.shields.io/badge/license-Apache-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache2-green.svg)](LICENSE)
 
 `sgxlib` leverages the established [incubator-teaclave-sgx-sdk][teaclave] as its underlying SGX SDK, providing a stable and efficient foundation.
 
