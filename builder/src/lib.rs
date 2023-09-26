@@ -40,6 +40,10 @@ lazy_static! {
                 let key = Rsa::generate_with_e(3072, &BigNum::from_u32(3).unwrap()).unwrap();
                 let pem = key.private_key_to_pem().unwrap();
                 fs::write(&ephemeral_key, pem).unwrap();
+
+                let pubkey_path = Path::new(&OUT_DIR.to_string()).join("public.pem");
+                let pubkey_pem = key.public_key_to_pem().unwrap();
+                fs::write(&pubkey_path, pubkey_pem).unwrap();
             }
             ephemeral_key.to_str().unwrap().to_string()
         }

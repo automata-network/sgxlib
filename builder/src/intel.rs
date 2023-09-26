@@ -252,11 +252,11 @@ pub struct Sign {
 }
 
 impl Sign {
-    pub fn new() -> Sign {
+    pub fn new(args: Vec<String>) -> Sign {
         let binary_path = sgx_sdk().join("bin/x64/sgx_sign");
         Sign {
             binary_path,
-            args: vec!["sign".to_string()],
+            args: args,
         }
     }
 
@@ -280,6 +280,18 @@ impl Sign {
 
     pub fn out(&mut self, file_path: &PathBuf) -> &mut Self {
         self.args.push("-out".to_string());
+        self.args.push(file_path.to_str().unwrap().to_string());
+        self
+    }
+
+    pub fn sig(&mut self, file_path: &PathBuf) -> &mut Self {
+        self.args.push("-sig".to_string());
+        self.args.push(file_path.to_str().unwrap().to_string());
+        self
+    }
+
+    pub fn unsigned(&mut self, file_path: &PathBuf) -> &mut Self {
+        self.args.push("-unsigned".to_string());
         self.args.push(file_path.to_str().unwrap().to_string());
         self
     }

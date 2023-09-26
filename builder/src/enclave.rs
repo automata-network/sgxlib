@@ -31,6 +31,7 @@ pub struct Build {
     toolchain: String,
     enclave_path: PathBuf,
     signed_enclave_path: PathBuf,
+    signing_material_data_path: PathBuf,
     teaclave_dir: PathBuf,
     local_dependencies: Vec<PathBuf>,
 }
@@ -78,6 +79,7 @@ impl Build {
         let linker_script_path = manifest_dir.join(&metadata.enclave.linker_script);
         let enclave_path = out_dir.join(&format!("{}.so", &crate_name));
         let signed_enclave_path = out_dir.join(&format!("{}.signed.so", &crate_name));
+        let signing_material_data_path = out_dir.join(&format!("{}.hex", &crate_name));
 
         let toolchain = fs::read_to_string(&manifest_dir.join("rust-toolchain"))
             .map_or(teaclave::RUST_TOOLCHAIN.to_string(), |s| {
@@ -99,6 +101,7 @@ impl Build {
             toolchain,
             enclave_path,
             signed_enclave_path,
+            signing_material_data_path,
             local_dependencies,
         }
     }
@@ -251,7 +254,7 @@ impl Build {
     pub fn sign_enclave(&self) {
         let key = Path::new(&ENCLAVE_SIGNING_KEY.to_string()).to_path_buf();
 
-        intel::Sign::new()
+        intel::Sign::new(vec!["sign".to_string()])
             .config(&self.config_path)
             .enclave(&self.enclave_path)
             .out(&self.signed_enclave_path)
@@ -259,8 +262,35 @@ impl Build {
             .run();
     }
 
+    pub fn generate_enclave_material_data(&self) {
+        intel::Sign::new(vec!["gendata".to_string()])
+            .config(&self.config_path)
+            .enclave(&self.enclave_path)
+            .out(&self.signing_material_data_path)
+            .run();
+    }
+
+    pub fn sign_generated_enclave_data(&self, pubkey_path: &PathBuf, signature_hex_path: &PathBuf) {
+        intel::Sign::new(vec!["catsig".to_string()])
+            .config(&self.config_path)
+            .enclave(&self.enclave_path)
+            .out(&self.signed_enclave_path)
+            .key(pubkey_path)
+            .sig(signature_hex_path)
+            .unsigned(&self.signing_material_data_path)
+            .run();
+    }
+
     pub fn signed_enclave_path(&self) -> &PathBuf {
         &self.signed_enclave_path
+    }
+
+    pub fn signing_material_data_path(&self) -> &PathBuf {
+        &self.signing_material_data_path
+    }
+
+    pub fn crate_name(&self) -> &String {
+        &self.crate_name
     }
 
     pub fn build_untrusted(&self) {
