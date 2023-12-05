@@ -8,4 +8,5 @@ edition = "2021"
 
 [dependencies]
 sgxlib = { path = "../", default-features = false, features = ["urts", "types"] }
-
+goblin = { version = "0.6" }
+log = { version = "=0.4.14" }

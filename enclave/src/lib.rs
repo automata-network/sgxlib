@@ -6,6 +6,34 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct Enclave {
     enclave: Arc<SgxEnclave>,
+    filepath: String,
+}
+
+pub fn mrenclave(filepath: &str) -> Result<[u8; 32], String> {
+    let data = std::fs::read(filepath).map_err(|err| format!("{:?}", err))?;
+    let elf = goblin::elf::Elf::parse(&data).map_err(|err| format!("{:?}", err))?;
+    let shstrndx = elf.header.e_shstrndx as usize;
+    let string_table = &elf.section_headers[shstrndx];
+    let section_name_strtab = &data
+        [string_table.sh_offset as usize..(string_table.sh_offset + string_table.sh_size) as usize];
+
+    for section in &elf.section_headers {
+        let name_offset = section.sh_name as usize;
+        let name = &section_name_strtab[name_offset..]
+            .split(|&x| x == 0)
+            .next()
+            .ok_or("invalid section name".to_owned())?;
+        if name == b".note.sgxmeta" {
+            let offset = section.sh_offset as usize;
+            let size = section.sh_size as usize;
+            let section_data = &data[offset..offset + size];
+            let mut mrenclave = [0_u8; 32];
+            mrenclave.copy_from_slice(&section_data[1049..1081]);
+            return Ok(mrenclave);
+        }
+    }
+
+    return Err("mrenclave not found".to_owned());
 }
 
 impl Enclave {
@@ -19,7 +47,14 @@ impl Enclave {
         };
         let name = format!("{}.signed.so", name);
         let enclave = Arc::new(Self::_init_enclave(&name));
-        Self { enclave }
+        Self {
+            enclave,
+            filepath: name,
+        }
+    }
+
+    pub fn mrenclave(&self) -> Result<[u8; 32], String> {
+        mrenclave(&self.filepath)
     }
 
     pub fn eid(&self) -> sgx_enclave_id_t {
